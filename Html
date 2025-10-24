@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Code Submit System</title>
+<style>
+  body { font-family: sans-serif; text-align: center; background: #111; color: #fff; }
+  .box { margin: 20px auto; width: 90%; max-width: 400px; background: #222; padding: 20px; border-radius: 10px; }
+  input { width: 90%; margin: 8px 0; padding: 10px; border-radius: 5px; border: none; }
+  button { padding: 10px 20px; margin-top: 10px; border: none; background: #00ff88; color: #000; font-weight: bold; border-radius: 8px; cursor: pointer; }
+  button:hover { background: #00cc66; }
+  .balance { margin-top: 20px; font-size: 18px; color: #0f0; }
+</style>
+</head>
+<body>
+
+<div class="box">
+  <h2>🎮 Daily Code Submit</h2>
+  <input id="codeA" placeholder="Enter Code A"><br>
+  <input id="codeB" placeholder="Enter Code B"><br>
+  <input id="codeC" placeholder="Enter Code C"><br>
+  <button onclick="submitCodes()">Submit Codes</button>
+  
+  <div class="balance">💰 Balance: <span id="balance">0.00</span> Taka</div>
+  <button onclick="requestCashout()">Cashout</button>
+</div>
+
+<script>
+let balance = 0;
+let telegramUserId = "USER_ID_HERE"; // এখানে ইউজার আইডি ভবিষ্যতে টেলিগ্রাম থেকে আসবে
+
+function submitCodes() {
+  const codes = [codeA.value.trim(), codeB.value.trim(), codeC.value.trim()];
+  if (codes.some(c => !c)) return alert("সব কোড দিন!");
+
+  balance += 1.5; // ৩টা কোডে ৫০ পয়সা × ৩ = ১.৫ টাকা
+  document.getElementById('balance').innerText = balance.toFixed(2);
+
+  fetch("https://YOUR_RENDER_BACKEND_URL/api/logCode", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId: telegramUserId, codes, balance })
+  });
+}
+
+function requestCashout() {
+  if (balance < 50) return alert("ন্যূনতম ৫০ টাকা হতে হবে!");
+  
+  fetch("https://YOUR_RENDER_BACKEND_URL/api/cashout", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId: telegramUserId, amount: balance })
+  });
+
+  alert("Cashout request sent!");
+  balance = 0;
+  document.getElementById('balance').innerText = balance.toFixed(2);
+}
+</script>
+
+</body>
+</html>
